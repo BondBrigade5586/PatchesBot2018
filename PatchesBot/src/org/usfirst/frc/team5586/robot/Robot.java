@@ -16,20 +16,43 @@ public class Robot extends IterativeRobot {
     private static final int RIGHT_BACK_TALON_PORT = 4;
     
     private static final int SHIFTER_SERVO_PORT = 5;
+    private static final int RT_RT_ARM_PORT = 5;
+    
+    private static final int GRABBER_LEFT_PORT = 6;
+    private static final int GRABBER_RIGHT_PORT = 7;
+    
+    private static final int LIFT_1_PORT = 8;
+    private static final int LIFT_2_PORT = 9;
+    private static final int LIFT_3_PORT = 0;
+    
+	private static final int JOYSTICK_CLUTCH_CLOSE = 3;
+	private static final int JOYSTICK_CLUTCH_OPEN = 4;
 
-	private DifferentialDrive differentialDrive;
 	private Joystick joyStick = new Joystick(0);
 	private Timer timer = new Timer();
 	
-	private Talon leftFront;
-	private Talon leftBack;
-	private Talon rightFront;
-	private Talon rightBack;
-	
+	// *****************
+	// Drive base motors	
+	// *****************
+	private DifferentialDrive differentialDrive;
+	private Talon leftFrontMotor;
+	private Talon leftBackMotor;
+	private Talon rightFrontMotor;
+	private Talon rightBackMotor;
 	private SpeedControllerGroup leftDrive;
 	private SpeedControllerGroup rightDrive;
-
-	private Servo shifterServo;
+	
+    // *************************
+	// Lifter/Manipulator motors
+    // *************************
+	private SpeedControllerGroup liftDrive;
+	private Talon liftMotor1;
+	private Talon liftMotor2;
+	private Talon liftMotor3;
+	private Talon grabberMotorLeft;
+	private Talon grabberMotorRight;
+	private Servo gearboxClutchServo;
+	private Servo rtRtArmServo;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -38,19 +61,37 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {
 		
-		// Map motors & servos
-	    leftFront = new Talon(LEFT_FRONT_TALON_PORT);
-		leftBack = new Talon(LEFT_BACK_TALON_PORT);
-	    rightFront = new Talon(RIGHT_FRONT_TALON_PORT);
-		rightBack = new Talon(RIGHT_BACK_TALON_PORT);
-        shifterServo = new Servo(SHIFTER_SERVO_PORT);
-	    
-        // Setup SppedController groups
-        leftDrive = new SpeedControllerGroup(leftFront, leftBack);
-        rightDrive = new SpeedControllerGroup(rightFront, rightBack);
+		// *****************
+		// Drive base motors
+		// *****************
 
-        // Instantiate drive
+		leftFrontMotor = new Talon(LEFT_FRONT_TALON_PORT);
+		leftBackMotor = new Talon(LEFT_BACK_TALON_PORT);
+	    rightFrontMotor = new Talon(RIGHT_FRONT_TALON_PORT);
+		rightBackMotor = new Talon(RIGHT_BACK_TALON_PORT);
+		
+        leftDrive = new SpeedControllerGroup(leftFrontMotor, leftBackMotor);
+        rightDrive = new SpeedControllerGroup(rightFrontMotor, rightBackMotor);
+
         differentialDrive = new DifferentialDrive(leftDrive, rightDrive);
+		
+        // *************************
+		// Lifter/Manipulator motors
+        // *************************
+
+        gearboxClutchServo = new Servo(SHIFTER_SERVO_PORT);
+        rtRtArmServo = new Servo(RT_RT_ARM_PORT);
+
+        grabberMotorLeft = new Talon(GRABBER_LEFT_PORT);
+        grabberMotorRight = new Talon (GRABBER_RIGHT_PORT);
+        
+        liftMotor1 = new Talon(LIFT_1_PORT);
+        liftMotor2 = new Talon(LIFT_2_PORT);
+        liftMotor3 = new Talon(LIFT_3_PORT);
+        liftDrive = new SpeedControllerGroup(liftMotor1, liftMotor2, liftMotor3);
+
+        grabberMotorLeft = new Talon(GRABBER_LEFT_PORT);
+        grabberMotorRight = new Talon(GRABBER_RIGHT_PORT);
         
 	}
 
@@ -92,12 +133,12 @@ public class Robot extends IterativeRobot {
 		// Drive the robot
 		differentialDrive.arcadeDrive(joyStick.getY()*-1, joyStick.getX());
 		
-		// Servo control
-		if (joyStick.getRawButton(3)) {
-			shifterServo.set(0);
+		// Gearbox clutch
+		if (joyStick.getRawButton(JOYSTICK_CLUTCH_CLOSE)) {
+			gearboxClutchServo.set(0);
 		}
-		if (joyStick.getRawButton(4)) {
-			shifterServo.set(0.5);
+		if (joyStick.getRawButton(JOYSTICK_CLUTCH_OPEN)) {
+			gearboxClutchServo.set(0.5);
 		}
 		
 		// Next...
