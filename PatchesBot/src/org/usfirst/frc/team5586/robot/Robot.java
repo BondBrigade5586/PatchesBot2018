@@ -1,11 +1,13 @@
 package org.usfirst.frc.team5586.robot;
 
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 public class Robot extends IterativeRobot {
@@ -24,11 +26,21 @@ public class Robot extends IterativeRobot {
     private static final int LIFT_1_PORT = 8;
     private static final int LIFT_2_PORT = 9;
     private static final int LIFT_3_PORT = 0;
-    
-	private static final int JOYSTICK_CLUTCH_CLOSE = 3;
-	private static final int JOYSTICK_CLUTCH_OPEN = 4;
 
+	/*
+     * Drive control handled on Joystick
+     * 
+     * XBox Lifter Controls
+     * ---------------------------
+     * GearBox Clutch   A & B
+     * Lifter           Stick
+     * RtRt             X & Y
+     * Grabber          LB & RB
+     */
+    
 	private Joystick joyStick = new Joystick(0);
+	private XboxController xbox = new XboxController(1);
+	
 	private Timer timer = new Timer();
 	
 	// *****************
@@ -45,10 +57,10 @@ public class Robot extends IterativeRobot {
     // *************************
 	// Lifter/Manipulator motors
     // *************************
-	private SpeedControllerGroup liftDrive;
 	private Talon liftMotor1;
 	private Talon liftMotor2;
 	private Talon liftMotor3;
+	private SpeedControllerGroup liftDrive;
 	private Talon grabberMotorLeft;
 	private Talon grabberMotorRight;
 	private Servo gearboxClutchServo;
@@ -78,12 +90,6 @@ public class Robot extends IterativeRobot {
         // *************************
 		// Lifter/Manipulator motors
         // *************************
-
-        gearboxClutchServo = new Servo(SHIFTER_SERVO_PORT);
-        rtRtArmServo = new Servo(RT_RT_ARM_PORT);
-
-        grabberMotorLeft = new Talon(GRABBER_LEFT_PORT);
-        grabberMotorRight = new Talon (GRABBER_RIGHT_PORT);
         
         liftMotor1 = new Talon(LIFT_1_PORT);
         liftMotor2 = new Talon(LIFT_2_PORT);
@@ -92,6 +98,9 @@ public class Robot extends IterativeRobot {
 
         grabberMotorLeft = new Talon(GRABBER_LEFT_PORT);
         grabberMotorRight = new Talon(GRABBER_RIGHT_PORT);
+        
+        gearboxClutchServo = new Servo(SHIFTER_SERVO_PORT);
+        rtRtArmServo = new Servo(RT_RT_ARM_PORT);
         
 	}
 
@@ -130,18 +139,48 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		
+		// *****************
+		// Drive base motors
+		// *****************
+		
 		// Drive the robot
 		differentialDrive.arcadeDrive(joyStick.getY()*-1, joyStick.getX());
 		
-		// Gearbox clutch
-		if (joyStick.getRawButton(JOYSTICK_CLUTCH_CLOSE)) {
+        // *************************
+		// Lifter/Manipulator motors
+        // *************************
+
+		// GearBox clutch open
+		if (xbox.getAButton()) {
 			gearboxClutchServo.set(0);
 		}
-		if (joyStick.getRawButton(JOYSTICK_CLUTCH_OPEN)) {
+		// GearBox clutch close
+		if (xbox.getBButton()) {
 			gearboxClutchServo.set(0.5);
 		}
 		
-		// Next...
+		// Motors - Up/Down
+		liftDrive.set(xbox.getRawAxis(1));
+		
+		// RtRt open
+		if (xbox.getXButton()) {
+			rtRtArmServo.set(0.5);
+		}
+		// RtRt close
+		if (xbox.getYButton()) {
+			rtRtArmServo.set(0.0);
+		}
+		
+		// Crate pick up
+		if (xbox.getBumper(Hand.kLeft)) {
+			grabberMotorLeft.set(1.0);
+			grabberMotorRight.set(-1.0);
+		}		
+		// Crate release
+		if (xbox.getBumper(Hand.kRight)) {
+			grabberMotorLeft.set(-1.0);
+			grabberMotorRight.set(1.0);
+		}
 
 	}
 
