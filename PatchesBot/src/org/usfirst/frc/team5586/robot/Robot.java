@@ -12,25 +12,25 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 public class Robot extends IterativeRobot {
 	
-    private static final int LEFT_FRONT_TALON_PORT = 1;
-    private static final int LEFT_BACK_TALON_PORT = 3;
+    private static final int LEFT_FRONT_TALON_PORT = 0;
+    private static final int LEFT_BACK_TALON_PORT = 1;
     private static final int RIGHT_FRONT_TALON_PORT = 2;
-    private static final int RIGHT_BACK_TALON_PORT = 4;
+    private static final int RIGHT_BACK_TALON_PORT = 3;
     
-    private static final int SHIFTER_SERVO_PORT = 5;
-    private static final int RT_RT_ARM_PORT = 5;
+    private static final int SHIFTER_SERVO_PORT = 4;
+    private static final int RT_RT_ARM_PORT = 4;
     
-    private static final int GRABBER_LEFT_PORT = 6;
-    private static final int GRABBER_RIGHT_PORT = 7;
+    private static final int GRABBER_LEFT_PORT = 5;
+    private static final int GRABBER_RIGHT_PORT = 6;
     
-    private static final int LIFT_1_PORT = 8;
-    private static final int LIFT_2_PORT = 9;
-    private static final int LIFT_3_PORT = 0;
+    private static final int LIFT_1_PORT = 7;
+    private static final int LIFT_2_PORT = 8;
+    private static final int LIFT_3_PORT = 9;
 
 	/*
      * Drive control handled on Joystick
      * 
-     * XBox Lifter Controls
+     * Lifter controls on XBox 
      * ---------------------------
      * GearBox Clutch   A & B
      * Lifter           Stick
@@ -43,9 +43,9 @@ public class Robot extends IterativeRobot {
 	
 	private Timer timer = new Timer();
 	
-	// *****************
-	// Drive base motors	
-	// *****************
+	/*
+	 * Drive-train Motors
+	 */
 	private DifferentialDrive differentialDrive;
 	private Talon leftFrontMotor;
 	private Talon leftBackMotor;
@@ -54,9 +54,10 @@ public class Robot extends IterativeRobot {
 	private SpeedControllerGroup leftDrive;
 	private SpeedControllerGroup rightDrive;
 	
-    // *************************
-	// Lifter/Manipulator motors
-    // *************************
+	/*
+	 * Lifter/Manipulator motors
+	 * 
+	 */
 	private Talon liftMotor1;
 	private Talon liftMotor2;
 	private Talon liftMotor3;
@@ -95,12 +96,12 @@ public class Robot extends IterativeRobot {
         liftMotor2 = new Talon(LIFT_2_PORT);
         liftMotor3 = new Talon(LIFT_3_PORT);
         liftDrive = new SpeedControllerGroup(liftMotor1, liftMotor2, liftMotor3);
-
-        grabberMotorLeft = new Talon(GRABBER_LEFT_PORT);
-        grabberMotorRight = new Talon(GRABBER_RIGHT_PORT);
-        
-        gearboxClutchServo = new Servo(SHIFTER_SERVO_PORT);
-        rtRtArmServo = new Servo(RT_RT_ARM_PORT);
+//
+//        grabberMotorLeft = new Talon(GRABBER_LEFT_PORT);
+//        grabberMotorRight = new Talon(GRABBER_RIGHT_PORT);
+//        
+//        gearboxClutchServo = new Servo(SHIFTER_SERVO_PORT);
+//        rtRtArmServo = new Servo(RT_RT_ARM_PORT);
         
 	}
 
@@ -144,43 +145,43 @@ public class Robot extends IterativeRobot {
 		// *****************
 		
 		// Drive the robot
-		differentialDrive.arcadeDrive(joyStick.getY()*-1, joyStick.getX());
+		differentialDrive.arcadeDrive(joyStick.getY()*-1, joyStick.getZ());
 		
         // *************************
 		// Lifter/Manipulator motors
         // *************************
 
-		// GearBox clutch open
-		if (xbox.getAButton()) {
-			gearboxClutchServo.set(0);
-		}
-		// GearBox clutch close
-		if (xbox.getBButton()) {
-			gearboxClutchServo.set(0.5);
-		}
-		
 		// Motors - Up/Down
 		liftDrive.set(xbox.getRawAxis(1));
 		
-		// RtRt open
-		if (xbox.getXButton()) {
-			rtRtArmServo.set(0.5);
-		}
-		// RtRt close
-		if (xbox.getYButton()) {
-			rtRtArmServo.set(0.0);
-		}
-		
-		// Crate pick up
-		if (xbox.getBumper(Hand.kLeft)) {
-			grabberMotorLeft.set(1.0);
-			grabberMotorRight.set(-1.0);
-		}		
-		// Crate release
-		if (xbox.getBumper(Hand.kRight)) {
-			grabberMotorLeft.set(-1.0);
-			grabberMotorRight.set(1.0);
-		}
+//		// GearBox clutch open
+//		if (xbox.getAButton()) {
+//			gearboxClutchServo.set(0);
+//		}
+//		// GearBox clutch close
+//		if (xbox.getBButton()) {
+//			gearboxClutchServo.set(0.5);
+//		}
+//		
+//		// RtRt open
+//		if (xbox.getXButton()) {
+//			rtRtArmServo.set(0.5);
+//		}
+//		// RtRt close
+//		if (xbox.getYButton()) {
+//			rtRtArmServo.set(0.0);
+//		}
+//		
+//		// Crate pick up
+//		if (xbox.getBumper(Hand.kLeft)) {
+//			grabberMotorLeft.set(1.0);
+//			grabberMotorRight.set(-1.0);
+//		}		
+//		// Crate release
+//		if (xbox.getBumper(Hand.kRight)) {
+//			grabberMotorLeft.set(-1.0);
+//			grabberMotorRight.set(1.0);
+//		}
 
 	}
 
